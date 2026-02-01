@@ -12,12 +12,11 @@ Live Demo: https://agrisakhi.vercel.app/
 ## Features
 - AI detects 200+ plant diseases with 95% accuracy using TensorFlow.js  
 - Instant results (<2 seconds) with confidence score & severity level  
-- Multiple input: Camera, gallery, batch upload, video frames  
+- Multiple input: Camera, gallery
 - Treatment recommendations (organic + chemical) with dosage  
-- 15+ languages: English, Hindi, Spanish, French, Arabic, Bengali, etc.  
-- Expert consultation (24-48 hour response)  
+- 3+ languages: English, Hindi, kannada ,urdu etc.   
 - Community forum & knowledge base  
-- PDF report generation with QR code  
+- PDF report generation
 - Push notifications & analytics dashboard  
 - Fully responsive + dark mode  
 
