@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 
-const DETECTION_MODEL = 'google/gemini-3.5-flash';
+// Vision-capable models, tried in order. If one is rate-limited, the next is used.
+const DETECTION_MODELS = [
+  'google/gemini-2.5-flash',
+  'google/gemini-2.5-flash-lite',
+  'openai/gpt-5-nano',
+];
 
 const DETECTION_PROMPT = `You are an expert plant pathologist. Analyze this plant image and identify any diseases.
 
@@ -45,22 +50,37 @@ export async function POST(request: NextRequest) {
     const bytes = await imageFile.arrayBuffer();
     const imageData = new Uint8Array(bytes);
 
-    const { text } = await generateText({
-      model: DETECTION_MODEL,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: DETECTION_PROMPT },
+    let text = '';
+    let lastError: unknown = null;
+    for (const model of DETECTION_MODELS) {
+      try {
+        const result = await generateText({
+          model,
+          maxRetries: 1,
+          messages: [
             {
-              type: 'file',
-              data: imageData,
-              mediaType: imageFile.type || 'image/jpeg',
+              role: 'user',
+              content: [
+                { type: 'text', text: DETECTION_PROMPT },
+                {
+                  type: 'file',
+                  data: imageData,
+                  mediaType: imageFile.type || 'image/jpeg',
+                },
+              ],
             },
           ],
-        },
-      ],
-    });
+        });
+        text = result.text;
+        break;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (!text) {
+      throw lastError ?? new Error('All detection models are currently unavailable');
+    }
 
     // Parse JSON from response (remove markdown code blocks if present)
     let cleanText = text.trim();

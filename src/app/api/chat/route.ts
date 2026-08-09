@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 
-const CHAT_MODEL = 'google/gemini-3.5-flash';
+// Models tried in order. If one is rate-limited, the next is used.
+const CHAT_MODELS = [
+  'google/gemini-2.5-flash',
+  'google/gemini-2.5-flash-lite',
+  'openai/gpt-5-nano',
+];
 
 const SYSTEM_PROMPT = `You are Sakhi-AI, an expert agricultural assistant for AgriSakhi app. You help farmers with:
 - Plant disease identification and treatment
@@ -23,15 +28,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { text } = await generateText({
-      model: CHAT_MODEL,
-      system: SYSTEM_PROMPT,
-      prompt: message,
-      temperature: 0.7,
-    });
+    let text = '';
+    let lastError: unknown = null;
+    for (const model of CHAT_MODELS) {
+      try {
+        const result = await generateText({
+          model,
+          maxRetries: 1,
+          system: SYSTEM_PROMPT,
+          prompt: message,
+          temperature: 0.7,
+        });
+        text = result.text;
+        break;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (!text) {
+      throw lastError ?? new Error('All chat models are currently unavailable');
+    }
 
     return NextResponse.json({
-      response: text || 'Sorry, I could not generate a response.',
+      response: text,
     });
   } catch (error) {
     console.error('Chat API Error:', error);
