@@ -48,21 +48,14 @@ export function Providers({ children }: { children: ReactNode }) {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // Service worker registration
-    if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .then((registration) => {
-          console.log("Service Worker registered:", registration);
-
-          // Check for updates periodically
-          setInterval(() => {
-            registration.update();
-          }, 60 * 60 * 1000); // Check every hour
-        })
-        .catch((error) => {
-          console.error("Service Worker registration failed:", error);
-        });
+    // Service worker is auto-registered by next-pwa (/sw.js).
+    // Clean up any stale caches from previous versions of the app.
+    if ("serviceWorker" in navigator && "caches" in window) {
+      caches.keys().then((keys) => {
+        keys
+          .filter((key) => key === "api-cache")
+          .forEach((key) => caches.delete(key));
+      });
     }
 
     return () => {
