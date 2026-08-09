@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 
-// Vision-capable models, tried in order. If one is rate-limited, the next is used.
+// Fastest vision-capable models first. If one is rate-limited or unavailable, the next is used.
 const DETECTION_MODELS = [
-  'google/gemini-2.5-flash',
   'google/gemini-2.5-flash-lite',
-  'openai/gpt-5-nano',
+  'openai/gpt-4o-mini',
+  'google/gemini-2.5-flash',
 ];
+
+// Disable Gemini "thinking" tokens for lower latency
+const SPEED_OPTIONS = {
+  google: { thinkingConfig: { thinkingBudget: 0 } },
+};
 
 const DETECTION_PROMPT = `You are an expert plant pathologist. Analyze this plant image and identify any diseases.
 
@@ -56,7 +61,8 @@ export async function POST(request: NextRequest) {
       try {
         const result = await generateText({
           model,
-          maxRetries: 1,
+          maxRetries: 0, // fail fast; the next model in the list is the retry
+          providerOptions: SPEED_OPTIONS,
           messages: [
             {
               role: 'user',

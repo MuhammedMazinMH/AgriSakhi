@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 
-// Models tried in order. If one is rate-limited, the next is used.
+// Fastest models first. If one is rate-limited or unavailable, the next is used.
 const CHAT_MODELS = [
-  'google/gemini-2.5-flash',
   'google/gemini-2.5-flash-lite',
-  'openai/gpt-5-nano',
+  'openai/gpt-4o-mini',
+  'google/gemini-2.5-flash',
 ];
+
+// Disable Gemini "thinking" tokens for lower latency
+const SPEED_OPTIONS = {
+  google: { thinkingConfig: { thinkingBudget: 0 } },
+};
 
 const SYSTEM_PROMPT = `You are Sakhi-AI, an expert agricultural assistant for AgriSakhi app. You help farmers with:
 - Plant disease identification and treatment
@@ -34,10 +39,11 @@ export async function POST(request: NextRequest) {
       try {
         const result = await generateText({
           model,
-          maxRetries: 1,
+          maxRetries: 0, // fail fast; the next model in the list is the retry
           system: SYSTEM_PROMPT,
           prompt: message,
           temperature: 0.7,
+          providerOptions: SPEED_OPTIONS,
         });
         text = result.text;
         break;
