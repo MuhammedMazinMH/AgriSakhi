@@ -1,38 +1,18 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Leaf, Camera, History, LayoutDashboard, BookOpen } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
-  const supabase = createClientComponentClient();
 
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
+  // Hide navbar on landing page
+  const shouldHideNavbar = pathname === '/';
 
-    checkAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
-
-  // Hide navbar on landing page, auth pages, OR if not authenticated
-  const shouldHideNavbar = pathname === '/' || pathname?.startsWith('/auth') || !isAuthenticated;
-  
   if (shouldHideNavbar) {
     return null;
   }

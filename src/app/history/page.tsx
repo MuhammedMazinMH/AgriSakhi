@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Search, Filter, Download, Eye, Trash2, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { formatDiseaseName } from "@/lib/ai/detection";
 import { useTranslation } from "react-i18next";
 
@@ -25,16 +24,12 @@ export default function HistoryPage() {
   const { t } = useTranslation();
   const [detections, setDetections] = useState<Detection[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const supabase = createClientComponentClient();
 
   // Load real detections from localStorage
   useEffect(() => {
-    const loadDetections = async () => {
+    const loadDetections = () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const storageKey = user ? `detection-history-${user.id}` : 'detection-history';
-        
-        const stored = localStorage.getItem(storageKey);
+        const stored = localStorage.getItem('detection-history');
         if (stored) {
           const parsed = JSON.parse(stored);
           setDetections(parsed);
@@ -57,7 +52,7 @@ export default function HistoryPage() {
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
-  }, [supabase]);
+  }, []);
 
   const filteredDetections = detections.filter((detection) => {
     const matchesSearch = formatDiseaseName(detection.disease)
@@ -79,15 +74,12 @@ export default function HistoryPage() {
     : 0;
   const detectionsLeft = Math.max(0, 50 - totalDetections);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     const confirmed = confirm(t('history.confirmDelete'));
     if (confirmed) {
       const updated = detections.filter(d => d.id !== id);
       setDetections(updated);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      const storageKey = user ? `detection-history-${user.id}` : 'detection-history';
-      localStorage.setItem(storageKey, JSON.stringify(updated));
+      localStorage.setItem('detection-history', JSON.stringify(updated));
     }
   };
 

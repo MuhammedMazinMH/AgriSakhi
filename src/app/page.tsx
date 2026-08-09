@@ -226,9 +226,9 @@ export default function Home() {
                     <Sparkles className="ml-2 h-5 w-5 animate-pulse" />
                   </Button>
                 </Link>
-                <Link href="/auth">
+                <Link href="/knowledge">
                   <Button size="lg" variant="outline" className="text-lg px-12 py-7 border-2 border-green-600 hover:bg-green-50 dark:hover:bg-green-950 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    {t('home.createAccount')}
+                    {t('home.exploreKnowledge', 'Explore Knowledge Base')}
                   </Button>
                 </Link>
               </div>

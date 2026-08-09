@@ -10,7 +10,6 @@ import { detectDisease } from "@/lib/ai/detection";
 import { toast } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function DetectPage() {
   const { t } = useTranslation();
@@ -20,7 +19,6 @@ export default function DetectPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const supabase = createClientComponentClient();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -123,18 +121,14 @@ export default function DetectPage() {
       }));
 
       // Add to detection history (limit to last 50 detections to prevent quota issues)
+      const storageKey = 'detection-history';
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const storageKey = user ? `detection-history-${user.id}` : 'detection-history';
-        
         const existingHistory = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const updatedHistory = [detectionRecord, ...existingHistory].slice(0, 50); // Keep only last 50
         localStorage.setItem(storageKey, JSON.stringify(updatedHistory));
       } catch {
         // If quota exceeded, clear old history and keep only new detection
         console.warn('LocalStorage quota exceeded, clearing old history');
-        const { data: { user } } = await supabase.auth.getUser();
-        const storageKey = user ? `detection-history-${user.id}` : 'detection-history';
         localStorage.setItem(storageKey, JSON.stringify([detectionRecord]));
       }
 
