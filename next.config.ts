@@ -105,9 +105,12 @@ const nextConfig: NextConfig = {
 // PWA Configuration
 const pwaConfig = withPWA({
   dest: 'public',
-  disable: false, // Enable PWA in development too
+  disable: process.env.NODE_ENV === 'development',
   register: true,
   workboxOptions: {
+    skipWaiting: true,
+    clientsClaim: true,
+    cleanupOutdatedCaches: true,
     runtimeCaching: [
       {
         urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
@@ -155,23 +158,23 @@ const pwaConfig = withPWA({
       },
       {
         urlPattern: /\.(?:js)$/i,
-        handler: 'StaleWhileRevalidate',
+        handler: 'NetworkFirst',
         options: {
           cacheName: 'static-js-assets',
           expiration: {
             maxEntries: 32,
-            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours (offline fallback only)
           },
         },
       },
       {
         urlPattern: /\.(?:css|less)$/i,
-        handler: 'StaleWhileRevalidate',
+        handler: 'NetworkFirst',
         options: {
           cacheName: 'static-style-assets',
           expiration: {
             maxEntries: 32,
-            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours (offline fallback only)
           },
         },
       },
