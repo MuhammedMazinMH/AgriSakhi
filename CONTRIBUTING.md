@@ -18,7 +18,6 @@ Thank you for your interest in contributing to AgriSakhi! This document provides
 
 - Node.js 18+ and npm
 - Git
-- Supabase account (free tier)
 - Code editor (VS Code recommended)
 
 ### Fork and Clone
@@ -47,7 +46,7 @@ npm install --legacy-peer-deps
 cp env.template .env.local
 ```
 
-3. Add your Supabase credentials to `.env.local`
+3. Add your API credentials to `.env.local` (see `env.template`)
 
 4. Run development server:
 ```bash
@@ -381,8 +380,6 @@ Contributors will be:
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Supabase Documentation](https://supabase.com/docs)
-- [TensorFlow.js Guide](https://www.tensorflow.org/js/guide)
 - [PWA Documentation](https://web.dev/progressive-web-apps/)
 
 ---

@@ -86,9 +86,7 @@ export default function Chatbot() {
       console.error('Chat error:', error);
       const errorMessage: Message = {
         role: 'assistant',
-        content: error instanceof Error && error.message.includes('API key not configured')
-          ? '⚠️ Gemini API key not configured.\n\n📝 Setup:\n1. Visit: https://makersuite.google.com/app/apikey\n2. Create API key\n3. Add to .env.local:\n   NEXT_PUBLIC_GEMINI_API_KEY=your_key\n4. Restart server'
-          : 'Sorry, I encountered an error. Please make sure your Gemini API key is configured correctly.',
+        content: 'Sorry, I encountered an error. Please try again in a moment.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);

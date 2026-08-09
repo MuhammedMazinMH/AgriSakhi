@@ -25,11 +25,11 @@ export function Footer() {
       ],
     },
     {
-      title: "Account",
+      title: "Explore",
       links: [
-        { label: "Sign In", href: "/auth/signin" },
-        { label: "Sign Up", href: "/auth/signup" },
-        { label: "Profile", href: "/dashboard" },
+        { label: "AI Assistant", href: "/dashboard" },
+        { label: "Results", href: "/results" },
+        { label: "Dashboard", href: "/dashboard" },
       ],
     },
     {
